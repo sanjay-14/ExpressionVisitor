@@ -50,9 +50,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmployeeChangeSetExpressionVisitor.cs" />
     <Compile Include="ExpressionCombine.cs" />
     <Compile Include="ExpressionConvertor.cs" />
     <Compile Include="ExpressionWriter.cs" />
+    <Compile Include="IncludeInChangeSet.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

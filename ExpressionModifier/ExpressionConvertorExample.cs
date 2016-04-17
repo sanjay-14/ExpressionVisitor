@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace ExpressionModifier
 {//exmple
-    public class ExpressionConvertor : ExpressionVisitor
+
+    public class ExpressionConvertorExample : ExpressionVisitor
     {
         public Expression Modify(Expression expression)
         {

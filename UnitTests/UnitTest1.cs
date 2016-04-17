@@ -66,7 +66,7 @@ namespace UnitTests
             var modified = modif.Modify(e);
             System.Diagnostics.Debug.WriteLine(modified.ToString());
             var modifiedString = modified.ToString();
-            
+
             Assert.IsFalse(modifiedString.Contains("Status"));
             Assert.IsTrue(modifiedString.Contains("Any"));
             Assert.IsTrue(modifiedString.Contains("contextType"));//varible name of IncludeInChangeSet... just to make to test which detect the attribute value
@@ -83,7 +83,7 @@ namespace UnitTests
             var modifiedString = modified.ToString();
             Assert.IsFalse(modifiedString.Contains("Status"));
             Assert.IsTrue(modifiedString.Contains("Any"));
-            Assert.IsTrue(modifiedString.Contains("ContextValue == \"S\""));
+            Assert.IsTrue(modifiedString.Contains("contextType"));
         }
 
         [TestMethod]
@@ -97,8 +97,7 @@ namespace UnitTests
             System.Diagnostics.Debug.WriteLine(modified.ToString());
             var modifiedString = modified.ToString();
             Assert.IsFalse(modifiedString.Contains("Status"));
-            Assert.IsTrue(modifiedString.Contains("Contains"));
-            Assert.IsTrue(modifiedString.Contains("ContextValue"));
+            Assert.IsTrue(modifiedString.Contains("Contains(x.ContextValue)"));
         }
 
         [TestMethod]
@@ -114,7 +113,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void NotMappedProperty_Contains_Method_Removed()
+        public void Int_Type_Array_Transformed_To_String_Array_With_Context_Value_Property()
         {
             var designations = new int[] { 1, 2 };
             Expression<Func<Employee, bool>> e = x => x.ID == 2 && designations.Contains(x.DesignationId);
@@ -124,6 +123,9 @@ namespace UnitTests
             System.Diagnostics.Debug.WriteLine(modified.ToString());
             var modifiedString = modified.ToString();
             Assert.IsFalse(modifiedString.Contains("DesignationId"));
+            Assert.IsTrue(modifiedString.Contains("ContextValue"));
+            Assert.IsTrue(modifiedString.Contains("value(System.String[]).Contains(x.ContextValue))))"));
         }
+
     }
 }

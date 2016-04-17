@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace ExpressionModifier
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class IncludeInChangeSetAttribute : Attribute
+    public class IncludedInChangeSetAttribute : Attribute
     {
-        public IncludeInChangeSetAttribute(string contextType)
+        public IncludedInChangeSetAttribute(string contextType)
         {
             ContextType = contextType;
         }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ExpressionModifier
 {
-    public static class ExpressionWriter
+    public static class ExpressionThroughAPI
     {
         public static Expression GetExp()
         {

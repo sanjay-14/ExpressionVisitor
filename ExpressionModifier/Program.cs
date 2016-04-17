@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace ExpressionModifier
 {
@@ -15,9 +16,11 @@ namespace ExpressionModifier
         {
             //Utility.ParseExpression(e);
             Console.WriteLine("working");
-            var s = new string[] { "P", "T" };
+            //var s = new string[] { "P", "T" };
             var t = new string[] { "S" };
-            Expression<Func<Employee, bool>> e = c => t.Contains(c.Category) && c.Status == "T";
+            var d = new int[] { 1, 2 };
+            //Expression<Func<Employee, bool>> e = c => t.Contains(c.Category) && c.DesignationId == 2;
+            Expression<Func<Employee, bool>> e = c => t.Contains(c.Category) && d.Contains(c.DesignationId);
             //  Expression<Func<Employee, bool>> e = c => c.Status != "T";
 
             var modif = new EmployeeChangeSetExpressionVisitor();
@@ -30,13 +33,15 @@ namespace ExpressionModifier
 
             using (var context = new TempContext())
             {
-                employees = context.Employees.Where(modified).ToList();
+                employees = context.Employees.Include(c => c.EmployeeChangeSets).Where(modified).ToList();
             }
 
             if (employees.Any())
                 foreach (var item in employees)
                 {
-                    Console.WriteLine(string.Format("{0} ,{1},{2}", item.Name, item.Status, item.Category));
+                    EmployeeEntityFiller.Fill(item);
+                    Console.WriteLine(string.Format("Name:{0}\n ,STatus: {1}\n,Category:{2},\n DesignationID:{3} \n\n", item.Name, item.Status, item.Category, item.DesignationId));
+                    
                 }
 
             //var combined = FullName.TryCombiningExpressions(c => c.FirstName == "Dog", c => c.LastName == "Boy");
@@ -72,20 +77,17 @@ namespace ExpressionModifier
         }
         public int ID { get; set; }
         public string Name { get; set; }
-        [NotMapped
-        , IncludeInChangeSet("S", DatePropertyName = "Date")
-        
-        ]
+        [NotMapped, IncludedInChangeSet("S", DatePropertyName = "Date")]
         public string Status { get; set; }
+        public string LastName { get; set; }
         public string Category { get; set; }
-        [NotMapped]
+        [NotMapped, IncludedInChangeSet("D")]
         public int DesignationId { get; set; }
         public ICollection<EmployeeChangeSet> EmployeeChangeSets { get; set; }
     }
 
     public class EmployeeChangeSet
     {
-
         public int ID { get; set; }
         public string ContextType { get; set; }
         public string ContextValue { get; set; }

@@ -3,6 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq.Expressions;
 using ExpressionModifier;
 using System.Linq;
+using System.Collections.Generic;
+
 namespace UnitTests
 {
     [TestClass]
@@ -116,6 +118,21 @@ namespace UnitTests
         public void Int_Type_Array_Transformed_To_String_Array_With_Context_Value_Property()
         {
             var designations = new int[] { 1, 2 };
+            Expression<Func<Employee, bool>> e = x => x.ID == 2 && designations.Contains(x.DesignationId);
+            var modif = new EmployeeChangeSetExpressionVisitor();
+            System.Diagnostics.Debug.WriteLine(e.ToString());
+            var modified = modif.Modify(e);
+            System.Diagnostics.Debug.WriteLine(modified.ToString());
+            var modifiedString = modified.ToString();
+            Assert.IsFalse(modifiedString.Contains("DesignationId"));
+            Assert.IsTrue(modifiedString.Contains("ContextValue"));
+            Assert.IsTrue(modifiedString.Contains("value(System.String[]).Contains(x.ContextValue))))"));
+        }
+
+        [TestMethod]
+        public void Int_Type_List_Transformed_To_String_Array_With_Context_Value_Property()
+        {
+            var designations = new List<int> { 1, 2 };
             Expression<Func<Employee, bool>> e = x => x.ID == 2 && designations.Contains(x.DesignationId);
             var modif = new EmployeeChangeSetExpressionVisitor();
             System.Diagnostics.Debug.WriteLine(e.ToString());

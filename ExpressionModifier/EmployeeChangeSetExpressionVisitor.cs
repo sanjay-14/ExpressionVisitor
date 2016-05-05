@@ -15,11 +15,11 @@ namespace ExpressionModifier
             _paramenterExpression = expression.Parameters[0];
             return Visit(expression);
         }
-        
+
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             //to handle contain methed of properties whome has IncludedChangeSetAttribute.
-            var memeberExpression = node.Arguments[1] as MemberExpression;
+            var memeberExpression = (node.Object == null ? node.Arguments[1] : node.Arguments[0]) as MemberExpression;
             if (memeberExpression != null && IsNotMappedMember(memeberExpression) && node.Method.Name.Equals("Contains"))
             {
                 var contextType = GetContextType(memeberExpression);
@@ -36,7 +36,7 @@ namespace ExpressionModifier
 
             return base.VisitMethodCall(node);
         }
-        
+
         protected override Expression VisitBinary(BinaryExpression node)
         {
             if (node.NodeType == ExpressionType.AndAlso || node.NodeType == ExpressionType.OrElse)
@@ -47,7 +47,7 @@ namespace ExpressionModifier
             }
             return TransformVisitBinaryExpression(node);
         }
-        
+
         private Expression EmptyExpression()
         {
             return Expression.MakeBinary(ExpressionType.Equal, Expression.Constant(true, typeof(bool)), Expression.Constant(true, typeof(bool)), false, null);
@@ -109,7 +109,7 @@ namespace ExpressionModifier
             Expression contextValueProperty = Expression.Property(parameterExpression, "ContextValue");
             if (!methodCall.Arguments.Any()) throw new ArgumentNullException();
 
-            var containingArray = methodCall.Arguments[0];
+            var containingArray = methodCall.Object ?? methodCall.Arguments[0];
             Expression convertedToStringArray;
             if (isConversionToStringRequried(containingArray as MemberExpression))
             {
@@ -131,8 +131,19 @@ namespace ExpressionModifier
         {
             ParameterExpression parameterExpression = Expression.Parameter(typeof(EmployeeChangeSet), "s");
             Expression contextValueProperty = Expression.Property(parameterExpression, "ContextValue");
-
-            Expression e1 = Expression.MakeBinary(exp.NodeType, contextValueProperty, Expression.Constant(exp.Right.ToString()));
+            ConstantExpression rightExp = null;
+            if (exp.Right is UnaryExpression)
+            {
+                var constant = ((exp.Right as UnaryExpression).Operand as ConstantExpression);
+                if (constant == null) throw new InvalidCastException("Expression value conversion failed");
+                rightExp = Expression.Constant(constant.Value.ToString());
+            }
+            else
+            {
+                rightExp = exp.Right as ConstantExpression;
+            }
+            if (rightExp == null) throw new InvalidCastException("Expression value conversion failed");
+            Expression e1 = Expression.MakeBinary(exp.NodeType, contextValueProperty, rightExp);
             var lambda = Expression.Lambda<Func<EmployeeChangeSet, bool>>(e1, parameterExpression);
             return lambda;
         }

@@ -41,7 +41,7 @@ namespace ExpressionModifier
                 {
                     EmployeeEntityFiller.Fill(item);
                     Console.WriteLine(string.Format("Name:{0}\n ,STatus: {1}\n,Category:{2},\n DesignationID:{3} \n\n", item.Name, item.Status, item.Category, item.DesignationId));
-                    
+
                 }
 
             //var combined = FullName.TryCombiningExpressions(c => c.FirstName == "Dog", c => c.LastName == "Boy");
@@ -68,7 +68,7 @@ namespace ExpressionModifier
                               param.Name, left.Name, operation.NodeType, right.Value);
         }
     }
-
+    
     public class Employee
     {
         public Employee()
@@ -85,11 +85,13 @@ namespace ExpressionModifier
         public int DesignationId { get; set; }
         public ICollection<EmployeeChangeSet> EmployeeChangeSets { get; set; }
     }
-
+    
     public class EmployeeChangeSet
     {
         public int ID { get; set; }
+        [Index("ind1",1)]
         public string ContextType { get; set; }
+        [Index("ind1", 2)]
         public string ContextValue { get; set; }
         public DateTime Date { get; set; }
         public int EmployeeID { get; set; }

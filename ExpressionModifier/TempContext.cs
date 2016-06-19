@@ -17,6 +17,7 @@ namespace ExpressionModifier
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new EmployeeMap());
+            modelBuilder.Configurations.Add(new EmployeeChangeSetMap());
         }
 
         public DbSet<Employee> Employees { get; set; }
@@ -27,6 +28,16 @@ namespace ExpressionModifier
         public EmployeeMap()
         {
             this.HasKey(c => c.ID);
+        }
+    }
+
+    public class EmployeeChangeSetMap : System.Data.Entity.ModelConfiguration.EntityTypeConfiguration<EmployeeChangeSet>
+    {
+        public EmployeeChangeSetMap()
+        {
+            this.HasKey(c => c.ID);
+            this.Property(c => c.ContextValue).HasMaxLength(2).IsRequired();
+            this.Property(c => c.ContextType).HasMaxLength(2).IsRequired();
         }
     }
 }
